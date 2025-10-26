@@ -38,7 +38,7 @@ git clone git@gitlab.com:projekt-software-engineering/Quizduell.git
 Change into the newly created project folder
 
 ```shell
-cd iubh-quizprojekt
+cd Quizduell
 ```
 
 ### Step 2: Virtual Environment (The "Project Bubble")
