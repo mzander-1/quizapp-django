@@ -1,0 +1,32 @@
+{% extends "quiz/base.html" %}
+
+{% block content %}
+    <h1 class="text-3xl font-bold mb-4">Willkommen beim Uni Quiz!</h1>
+    
+    {% if user.is_authenticated %}
+        <p class="text-lg mb-6">
+            Hallo {{ user.username }}! Du bist eingeloggt und kannst jetzt loslegen.
+        </p>
+        <div class="space-y-4">
+            <!-- TODO: Links zu den App-Features hinzufügen -->
+            <a href="#" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-300">
+                Neues Spiel starten
+            </a>
+            <a href="#" class="inline-block px-6 py-3 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition duration-300">
+                Frage einreichen
+            </a>
+        </div>
+    {% else %}
+        <p class="text-lg mb-6">
+            Bitte logge dich ein oder registriere dich, um ein Spiel zu starten oder Fragen einzureichen.
+        </p>
+        <div class="space-x-4">
+            <a href="{% url 'login' %}" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-300">
+                Login
+            </a>
+            <a href="{% url 'register' %}" class="inline-block px-6 py-3 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition duration-300">
+                Registrieren
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

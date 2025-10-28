@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uni Quiz App</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10" xintegrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLFe8MHPZQ" crossorigin="anonymous"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    'sans': ['Inter', 'sans-serif'],
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Navbar -->
+     <nav class="bg-white shadow-md">
+        <div class="max-w-6x1 mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <!-- logo -->
+                     <div>
+                        <a href="{% url 'home' %}" class="flex items-center py-4 px-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.5M12 6.253c-1.21 0-2.39-.188-3.5-.52M12 6.253c1.21 0 2.39-.188 3.5-.52M12 6.253V3.75c0-.621-.504-1.125-1.125-1.125H11.25c-.621 0-1.125.504-1.125 1.125V6.253M12 6.253c-1.465 0-2.858.188-4.25.52m4.25-.52c1.465 0 2.858.188 4.25.52M4.5 8.25c0-1.21.188-2.39.52-3.5M4.5 8.25V11.25c0 .621.504 1.125 1.125 1.125H6.75c.621 0 1.125-.504 1.125-1.125V8.25M4.5 8.25c1.21 0 2.39.188 3.5.52M19.5 8.25c0-1.21-.188-2.39-.52-3.5M19.5 8.25V11.25c0 .621-.504 1.125-1.125 1.125H17.25c-.621 0-1.125-.504-1.125-1.125V8.25M19.5 8.25c-1.21 0-2.39.188-3.5.52" />
+                            </svg>
+                            <span class="font-semibold text-gray-700 text-lg">Uni Quiz</span>
+                        </a>
+                     </div>
+                </div>
+                <!-- Right Aligned Links -->
+                <div class="flex items-center space-x-3">
+                    {% if user.is_authenticated %}
+                        <span class="py-4 px-2 text-gray-500">Hi, {{ user.username }}</span>
+                        <!-- TODO: Add link to "Meine Fragen"-->
+                        <a href="#" class="py-4 px-2 text-gray-500 hover:text-blue-600 transition duration-300">Meine Fragen</a>
+                        <form method="post" action="{% url 'logout' %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-300 cursor-pointer">
+                                Logout
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="py-4 px-2 text-gray-500 hover:text-blue-600 transition duration-300">Login</a>
+                        <a href="{% url 'register' %}" class="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-300">Registrieren</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>" 
+     </nav>"
+
+    <!-- Main Content -->
+    <main class="max-w-6x1 mx-auto p-8">
+        <div class="bg-white p-8 rounded-lg shadow-md">
+            {% block content %}
+                <!-- Content will be injected here -->
+            {% endblock %}
+        </div>
+    </main>
+
+    
+</body>
+</html>
