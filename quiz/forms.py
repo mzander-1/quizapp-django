@@ -8,6 +8,6 @@ class CustomerUserCreationForm(UserCreationForm):
     We can add more fields (e.g. email) later if needed
     """
 
-    class Meta:
-        model = User
-        fields = ("username",)
+    # We define this class to potentially customize user creation in the future.
+    # For now, it simply inherits from UserCreationForm without changes.
+    pass
