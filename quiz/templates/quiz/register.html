@@ -25,9 +25,9 @@
 
         <!-- Password 1 -->
         <div class="mb-4">
-            <label for="{{ form.password.id_for_label }}" class="block text-gray-700 font-bold mb-2">Passwort:</label>
-            {{ form.password }}
-            {% for error in form.password.errors %}
+            <label for="{{ form.password1.id_for_label }}" class="block text-gray-700 font-bold mb-2">Passwort:</label>
+            {{ form.password1 }}
+            {% for error in form.password1.errors %}
                 <p class="text-red-500 text-xs italic mt-2">{{ error }}</p>
             {% endfor %}
         </div>

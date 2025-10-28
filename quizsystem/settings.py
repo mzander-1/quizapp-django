@@ -27,8 +27,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Local apps
-    "quiz.apps.QuizConfig",
     # External libraries
     "django_htmx",
     # apps
