@@ -25,7 +25,7 @@
 
     <!-- 1. Section: The Question itself -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 class="text-xl font-semibold mb-4">Question</h2>
+        <h2 class="text-xl font-semibold mb-4">Frage</h2>
 
         <!-- Course (if available) -->
         <div class="mb-4">
@@ -62,7 +62,7 @@
     <!-- 2. Section: The Answers (FormSet) -->
     <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-xl font-semibold mb-4">Antwortmöglichkeiten</h2>
-        <p class="text-sm text-gray-600 mb-4">Fülle mindestens eine Antwort aus und markiere genau eine davon als "Korrekt".</S>
+        <p class="text-sm text-gray-600 mb-4">Fülle mindestens eine Antwort aus und markiere genau eine davon als "Richtige Antowrt".</S>
         
         <div class="space-y-4">
             {% for form in answer_formset %}
@@ -83,7 +83,7 @@
                 <div class="flex items-center">
                     {{ form.is_correct }}
                     <label for="{{ form.is_correct.id_for_label }}" class="ml-2 block text-sm font-medium text-gray-700">
-                        Korrekt?
+                        Richtige Antwort
                     </label>
                 </div>
             </div>
