@@ -53,6 +53,32 @@ class QuestionForm(forms.ModelForm):
         }
 
 
+class AnswerForm(forms.ModelForm):
+    """
+    Form for creating or updating an Answer.
+    Used within an inline formset.
+    """
+
+    class Meta:
+        model = Answer
+        fields = ["text", "is_correct"]
+        widgets = {
+            "text": forms.Textarea(
+                attrs={
+                    "rows": 2,
+                    "class": "w-full border-gray-300 rounded-md shadow-sm autosize-textarea",
+                    "placeholder": "Antworttext eingeben...",
+                }
+            ),
+            "is_correct": forms.CheckboxInput(
+                attrs={
+                    "class": "h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                }
+            ),
+        }
+        labels = {"text": "Antworttext", "is_correct": "Richtige Antwort"}
+
+
 class BaseAnswerInlineFormSet(BaseInlineFormSet):
     """
     Custom formset to ensure at least one correct answer is provided.
@@ -89,7 +115,7 @@ class BaseAnswerInlineFormSet(BaseInlineFormSet):
 AnswerFormSet = inlineformset_factory(
     Question,  # Object parent model
     Answer,  # Object child model
-    fields=("text", "is_correct"),  # Fields to include in the formset
+    form=AnswerForm,  # Form class to use for each answer
     formset=BaseAnswerInlineFormSet,  # Custom formset class for validation
     extra=4,  # Number of extra forms to display
     max_num=4,  # Maximum number of forms allowed
