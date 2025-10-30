@@ -121,3 +121,35 @@ AnswerFormSet = inlineformset_factory(
     max_num=4,  # Maximum number of forms allowed
     can_delete=False,  # Disable deletion of answers (can be changed if needed)
 )
+
+
+class CreateGameForm(forms.Form):
+    """
+    Form to create a new game session by selecting a course.
+    """
+
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.all(),
+        label="Wähle einen Kurs",
+        empty_label="-- Bitte wählen --",
+        widget=forms.Select(
+            attrs={"class": "w-full border-gray-300 rounded-md shadow-sm"}
+        ),
+    )
+
+
+class JoinGameForm(forms.Form):
+    """
+    Form to join an existing game session by entering a 6-digit game session code.
+    """
+
+    join_code = forms.CharField(
+        label="Spielcode eingeben",
+        max_length=6,
+        widget=forms.TextInput(
+            attrs={
+                "class": "w-full border-gray-300 rounded-md shadow-sm",
+                "placeholder": "ABC123",
+            }
+        ),
+    )
