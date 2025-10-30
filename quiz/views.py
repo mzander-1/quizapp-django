@@ -1,6 +1,7 @@
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login
+from django.urls import reverse
 from .forms import (
     CustomerUserCreationForm,
     QuestionForm,
@@ -10,7 +11,8 @@ from .forms import (
 )
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Question, GameSession, GameParticipant
+from .models import Question, GameSession, GameParticipant, TeamGameAnswer, Answer
+from django.db.models import F
 
 
 # HOMEPAGE
@@ -140,7 +142,7 @@ def update_question(request, pk):
     )
 
 
-# GAME LOGIC
+# GAME SESSION LOGIC
 QUESTIONS_PER_GAME = 10
 
 
@@ -290,3 +292,237 @@ def poll_lobby_participants(request, join_code):
             "game_session": game_session,
         },
     )
+
+
+# GAMEPLAY LOGIC
+@login_required
+def poll_game_start(request, join_code):
+    """
+    Endpoint to poll whether the game has started.
+    """
+
+    game_session = get_object_or_404(GameSession, join_code=join_code.upper())
+
+    if game_session.status == "ACTIVE":
+        response = HttpResponse()
+        response["HX-Redirect"] = reverse("game_play", args=[join_code])
+        return response
+
+    return HttpResponse()
+
+
+@login_required
+def start_game(request, join_code):
+    """
+    Starts the game session. Only the host can start the game.
+    """
+
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    game_session = get_object_or_404(
+        GameSession, join_code=join_code.upper(), status="LOBBY"
+    )
+
+    host_participant = game_session.participants.order_by("id").first()
+    if not host_participant or host_participant.user != request.user:
+        messages.error(request, "Nur der Gastgeber kann das Spiel starten.")
+        return redirect("game_lobby", join_code=join_code)
+
+    first_question = game_session.questions.order_by("id").first()
+
+    if not first_question:
+        messages.error(
+            request, "Fehler: Keine Fragen für diese Spiel-Sitzung gefunden."
+        )
+        return redirect("home")
+
+    game_session.status = "ACTIVE"
+    game_session.current_question = first_question
+    game_session.save()
+
+    return redirect("game_view", join_code=join_code)
+
+
+@login_required
+def game_view(request, join_code):
+    """
+    Main game view where questions are presented and answered.
+    Renders Template which includes HTMX calls for dynamic updates.
+    """
+
+    game_session = get_object_or_404(
+        GameSession, join_code=join_code.upper(), participants__user=request.user
+    )
+
+    if game_session.status == "FINISHED":
+        return redirect("game_results", join_code=join_code)
+
+    if game_session.status == "LOBBY":
+        return redirect("game_lobby", join_code=join_code)
+
+    return render(request, "quiz/game_view.html", {"game_session": game_session})
+
+
+@login_required
+def game_state_poller(request, join_code):
+    """
+    Endpoint to poll the current game state and question.
+    Returns partial HTML for HTMX updates.
+    """
+
+    game_session = get_object_or_404(
+        GameSession, join_code=join_code.upper(), participants__user=request.user
+    )
+
+    # 1. If game is finished, redirect to results
+    if game_session.status == "FINISHED":
+        response = HttpResponse()
+        response["HX-Redirect"] = reverse("game_results", args=[join_code])
+        return response
+
+    # 2. Check if current question is already answered by participants
+    current_question = game_session.current_question
+
+    try:
+        team_answer = TeamGameAnswer.objects.get(
+            session=game_session,
+            question=current_question,
+        )
+        return render(
+            request,
+            "quiz/partials/_question_result.html",
+            {
+                "game_session": game_session,
+                "question": current_question,
+                "team_answer": team_answer,
+                "answered_by_user": (
+                    team_answer.answered_by.username
+                    if team_answer.answered_by
+                    else "jemand"
+                ),
+            },
+        )
+    except TeamGameAnswer.DoesNotExist:
+        # 3. Question not yet answered, show question
+
+        all_questions = list(
+            game_session.questions.order_by("id").values_list("id", flat=True)
+        )
+        try:
+            current_index = all_questions.index(current_question.id)
+            question_number = current_index + 1
+            total_questions = len(all_questions)
+        except (ValueError, AttributeError):
+            question_number = "?"
+            total_questions = "?"
+
+        return render(
+            request,
+            "quiz/partials/_game_question.html",
+            {
+                "game_session": game_session,
+                "question": current_question,
+                "question_number": question_number,
+                "total_questions": total_questions,
+            },
+        )
+
+
+@login_required
+def submit_answer(request, join_code, answer_pk):
+    """
+    Endpoint to submit an answer for the current question.
+    """
+
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    game_session = get_object_or_404(
+        GameSession, join_code=join_code.upper(), status="ACTIVE"
+    )
+    current_question = game_session.current_question
+    selected_answer = get_object_or_404(Answer, pk=answer_pk, question=current_question)
+
+    team_answer, created = TeamGameAnswer.objects.get_or_create(
+        session=game_session,
+        question=current_question,
+        defaults={
+            "selected_answer": selected_answer,
+            "answered_by": request.user,
+            "is_correct": selected_answer.is_correct,
+        },
+    )
+
+    if created and team_answer.is_correct:
+        GameParticipant.objects.filter(session=game_session).update(
+            score=F("score") + 10
+        )
+
+    # Render the question result to the user that submitted the answer, after 3 seconds HTMX will poll for the others
+    return render(
+        request,
+        "quiz/partials/_question_result.html",
+        {
+            "game_session": game_session,
+            "question": current_question,
+            "team_answer": team_answer,
+            "answered_by_user": (
+                team_answer.answered_by.username
+                if team_answer.answered_by
+                else "jemand"
+            ),
+        },
+    )
+
+
+@login_required
+def next_question(request, join_code):
+    """
+    Endpoint to move to the next question in the game session.
+    """
+    if request.method != "POST":
+        return HttpResponseNotAllowed(["POST"])
+
+    game_session = get_object_or_404(
+        GameSession, join_code=join_code.upper(), status="ACTIVE"
+    )
+    current_question = game_session.current_question
+
+    all_questions = list(game_session.questions.order_by("id"))
+
+    try:
+        current_index = all_questions.index(current_question)
+        next_question = all_questions[current_index + 1]
+
+        game_session.current_question = next_question
+        game_session.save()
+
+    except (ValueError, IndexError):
+        game_session.status = "FINISHED"
+        game_session.current_question = None
+        game_session.save()
+
+        response = HttpResponse()
+        response["HX-Redirect"] = reverse("game_results", args=[join_code])
+        return response
+
+    return HttpResponse(
+        '<div class="text-center p-10"><h2 class="text-2x1 font-semibold text-gray-700">Lade nächste Frage...</h2></div>   '
+    )
+
+
+@login_required
+def game_results(request, join_code):
+    """
+    Displays the results of the finished game session.
+    """
+
+    game_session = get_object_or_404(
+        GameSession,
+        join_code=join_code,
+        status="FINISHED",
+        participants__user=request.user,
+    )
+
+    return render(request, "quiz/game_results.html", {"game_session": game_session})
