@@ -110,7 +110,7 @@ You should see the Django welcome page or (later) our project homepage.
 
 #### Logging in as Admin
 
-To see the admin backend (Feature 2.3), go to:
+To see the admin backend, go to:
 ```
 http://127.0.0.1:8000/admin/
 ```
