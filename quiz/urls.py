@@ -31,7 +31,7 @@ urlpatterns = [
     path(
         "game/<str:join_code>/poll_start/",
         views.poll_game_start,
-        name="poll__game_start",
+        name="poll_game_start",
     ),
     path("game/<str:join_code>/start/", views.start_game, name="start_game"),
     path("game/<str:join_code>/play/", views.game_view, name="game_view"),
