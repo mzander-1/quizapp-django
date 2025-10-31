@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
+    {% csrf_token %}
 
     <div id="game-state" 
          hx-get="{% url 'game_state_poller' game_session.join_code %}" 

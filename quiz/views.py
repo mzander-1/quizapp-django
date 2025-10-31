@@ -11,6 +11,7 @@ from .forms import (
 )
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from .models import Question, GameSession, GameParticipant, TeamGameAnswer, Answer
 from django.db.models import F
 
@@ -430,6 +431,7 @@ def game_state_poller(request, join_code):
 
 
 @login_required
+@require_POST
 def submit_answer(request, join_code, answer_pk):
     """
     Endpoint to submit an answer for the current question.
@@ -477,6 +479,7 @@ def submit_answer(request, join_code, answer_pk):
 
 
 @login_required
+@require_POST
 def next_question(request, join_code):
     """
     Endpoint to move to the next question in the game session.
