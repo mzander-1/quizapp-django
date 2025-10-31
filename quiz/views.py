@@ -287,7 +287,7 @@ def poll_lobby_participants(request, join_code):
 
     return render(
         request,
-        "quiz/partials/_lobby_participant_list.html",
+        "quiz/partials/_lobby_participants_list.html",
         {
             "game_session": game_session,
         },
@@ -305,7 +305,7 @@ def poll_game_start(request, join_code):
 
     if game_session.status == "ACTIVE":
         response = HttpResponse()
-        response["HX-Redirect"] = reverse("game_play", args=[join_code])
+        response["HX-Redirect"] = reverse("game_view", args=[join_code])
         return response
 
     return HttpResponse()
