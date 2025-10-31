@@ -25,7 +25,7 @@
 
     <!-- Game-Start-Button -->
     {% if is_host %}
-        <form action="#" method="post"> <!-- TODO: Action zu "start_game" View ändern -->
+        <form action="{% url 'start_game' game_session.join_code %}" method="post">
             {% csrf_token %}
             <button type="submit" class="w-full max-w-md mx-auto py-3 px-6 bg-green-600 hover:bg-green-700 text-white text-xl font-bold rounded-md shadow-lg transition duration-300">
                 Spiel starten!
@@ -33,6 +33,10 @@
         </form>
         <p class="text-sm text-gray-500 mt-2">Nur der Host (Spielersteller) kann das Spiel starten.</p>
     {% else %}
+        <!-- Polling to check if the game has started every 3 seconds -->
+        <div hx-get="{% url 'poll_game_start' game_session.join_code %}" 
+             hx-trigger="every 3s">
+        </div>
         <p class="text-xl text-gray-600">Warte, bis der Host das Spiel startet...</p>
     {% endif %}
 

@@ -28,4 +28,21 @@ urlpatterns = [
         views.poll_lobby_participants,
         name="poll_lobby",
     ),
+    path(
+        "game/<str:join_code>/poll_start/",
+        views.poll_game_start,
+        name="poll__game_start",
+    ),
+    path("game/<str:join_code>/start/", views.start_game, name="start_game"),
+    path("game/<str:join_code>/play/", views.game_view, name="game_view"),
+    path(
+        "game/<str:join_code>/state/", views.game_state_poller, name="game_state_poller"
+    ),
+    path(
+        "game/<str:join_code>/submit/<int:answer_pk>/",
+        views.submit_answer,
+        name="submit_answer",
+    ),
+    path("game/<str:join_code>/next/", views.next_question, name="next_question"),
+    path("game/<str:join_code>/results/", views.game_results, name="game_results"),
 ]

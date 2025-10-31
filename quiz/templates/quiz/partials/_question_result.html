@@ -1,0 +1,43 @@
+<div class="bg-white p-8 rounded-lg shadow-md transition-all duration-300">
+    
+    <!-- Result: Right or Wrong -->
+    {% if team_answer.is_correct %}
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
+            <p class="font-bold text-xl">Richtig!</p>
+            <p>"{{ team_answer.selected_answer.text }}" war die korrekte Antwort. (Beantwortet von {{ answered_by_user }})</p>
+        </div>
+    {% else %}
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+            <p class="font-bold text-xl">Falsch!</p>
+            <p>Eure Antwort: "{{ team_answer.selected_answer.text }}" (Beantwortet von {{ answered_by_user }})</V>
+        </div>
+    {% endif %}
+
+    <!-- Questiontext -->
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">
+        {{ question.text }}
+    </h2>
+
+    <!-- Explanation -->
+    <div class="prose max-w-none p-4 bg-gray-50 rounded-md border border-gray-200">
+        <h3 class="text-lg font-semibold mb-2">Erklärung:</h3>
+        {% if question.explanation %}
+            <p>{{ question.explanation }}</p>
+        {% else %}
+            <p class="italic text-gray-500">Für diese Frage wurde keine Erklärung hinterlegt.</p>
+        {% endif %}
+    </div>
+
+    <!-- "Next Question" Button -->
+    <div class="mt-8 text-center">
+        <button 
+            class="w-full max-w-md mx-auto py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold rounded-md shadow-lg transition duration-300"
+            hx-post="{% url 'next_question' game_session.join_code %}"
+            hx-target="#game-state"
+            hx-swap="innerHTML">
+            
+            Nächste Frage
+        </button>
+    </div>
+</div>
+
