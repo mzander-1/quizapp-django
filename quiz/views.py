@@ -73,53 +73,42 @@ def my_question_list(request):
     with filtering, sorting, and grouping by status.
     """
 
-    # 1. Filter- und Sortierparameter aus der URL (GET-Request) holen
     status_filter = request.GET.get("status")
     course_filter = request.GET.get("course")
-    sort_by = request.GET.get("sort_by", "-created_at")  # Standard: Neueste zuerst
+    sort_by = request.GET.get("sort_by", "-created_at")
 
-    # 2. Basis-Queryset: Nur Fragen des angemeldeten Benutzers
     queryset = Question.objects.filter(creator=request.user)
 
-    # 3. Filter anwenden
     if status_filter:
         queryset = queryset.filter(status=status_filter)
     if course_filter:
-        queryset = queryset.filter(course_id=course_filter)  # course_id ist effizienter
+        queryset = queryset.filter(course_id=course_filter)
 
-    # 4. Sortierung anwenden (Whitelist, um Sicherheit zu gewährleisten)
     valid_sorts = ["created_at", "-created_at", "text", "-text"]
     if sort_by in valid_sorts:
         queryset = queryset.order_by(sort_by)
     else:
-        queryset = queryset.order_by("-created_at")  # Fallback auf Standard
+        queryset = queryset.order_by("-created_at")
 
-    # 5. Fragen nach Status gruppieren
-    # Wir bereiten die Gruppen vor, die angezeigt werden sollen
     grouped_questions = {}
     total_questions_found = 0
 
-    # Bestimmen, welche Status-Gruppen wir anzeigen müssen
-    # Entweder nur der gefilterte Status, oder alle
     if status_filter:
         statuses_to_show = [s for s in Question.STATUS_CHOICES if s[0] == status_filter]
     else:
         statuses_to_show = Question.STATUS_CHOICES
 
-    # Das bereits gefilterte/sortierte Queryset durchlaufen und Gruppen erstellen
     for code, name in statuses_to_show:
-        # Filtern des *bereits gefilterten* Querysets nach dem jeweiligen Status
         questions_in_group = queryset.filter(status=code)
 
         if questions_in_group.exists():
             grouped_questions[code] = {"name": name, "questions": questions_in_group}
             total_questions_found += questions_in_group.count()
 
-    # 6. Kontext für das Template vorbereiten
     context = {
         "grouped_questions": grouped_questions,
-        "all_courses": Course.objects.all(),  # Für den Kurs-Filter-Dropdown
-        "status_choices": Question.STATUS_CHOICES,  # Für den Status-Filter-Dropdown
+        "all_courses": Course.objects.all(),
+        "status_choices": Question.STATUS_CHOICES,
         "current_filters": {
             "status": status_filter,
             "course": course_filter,
