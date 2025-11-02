@@ -58,6 +58,11 @@ class Question(models.Model):
         default="PENDING",
         help_text="The review status of the question.",
     )
+    rejection_reason = models.TextField(
+        blank=True,
+        null=True,
+        help_text="If rejected, the reason for rejection.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

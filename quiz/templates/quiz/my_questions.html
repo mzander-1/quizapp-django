@@ -91,7 +91,14 @@
                                 {% endif %}
                                 Eingereicht am: {{ question.created_at|date:"d.m.Y" }}
                             </p>
-                        </div>
+
+                            {% if question.status == 'REJECTED' and question.rejection_reason %}
+                            <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                                <p class="text-sm font-medium text-red-800">Begründung für Ablehnung:</p>
+                                <p class="text-sm text-red-700 mt-1">{{ question.rejection_reason|linebreaksbr }}</p>
+                            </div>
+                            {% endif %}
+                            </div>
                         
                         <div class="flex items-center space-x-4">
                             <span class="hidden px-3 py-1 text-sm font-medium rounded-full
