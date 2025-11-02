@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login
@@ -598,3 +599,8 @@ from django.shortcuts import render
 
 # Create your views here.
 >>>>>>> cae4893 (Revert "Merge branch 'feature/game-lobby' into 'main'")
+=======
+from django.shortcuts import render
+
+# Create your views here.
+>>>>>>> cae489368c485b08cbc29e727f155b0d4b52de4b
