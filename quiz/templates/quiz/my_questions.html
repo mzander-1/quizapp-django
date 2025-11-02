@@ -8,52 +8,135 @@
     </a>
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
-    <ul class="divide-y divide-gray-200">
-        {% for question in questions %}
-        <li class="p-6 hover:bg-gray-50 transition duration-150">
-            <div class="flex justify-between items-center">
-                <div class="flex-1">
-                    <!-- Questiontext -->
-                    <p class="text-lg font-semibold text-gray-900">{{ question.text }}</p>
-                    
-                    <!-- Course and date of creation -->
-                    <p class="text-sm text-gray-500 mt-1">
-                        {% if question.course %}
-                            <span class="font-medium">{{ question.course.name }}</span> | 
-                        {% endif %}
-                        Eingereicht am: {{ question.created_at|date:"d.m.Y" }}
-                    </p>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <!-- Status-Badge -->
-                    <span class="px-3 py-1 text-sm font-medium rounded-full
-                        {% if question.status == 'APPROVED' %}
-                            bg-green-100 text-green-800
-                        {% elif question.status == 'REJECTED' %}
-                            bg-red-100 text-red-800
-                        {% else %}
-                            bg-yellow-100 text-yellow-800
+<form method="GET" action="{% url 'my_questions' %}" class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <div>
+            <label for="course" class="block text-sm font-medium text-gray-700">Kurs:</label>
+            <select name="course" id="course" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Alle Kurse</option>
+                {% for course in all_courses %}
+                    <option value="{{ course.pk }}" {% if current_filters.course == course.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ course.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="status" class="block text-sm font-medium text-gray-700">Status:</label>
+            <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Alle Stati</option>
+                {% for code, name in status_choices %}
+                    <option value="{{ code }}" {% if current_filters.status == code %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="sort_by" class="block text-sm font-medium text-gray-700">Sortieren nach:</label>
+            <select name="sort_by" id="sort_by" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="-created_at" {% if current_filters.sort_by == '-created_at' %}selected{% endif %}>Neueste zuerst</option>
+                <option value="created_at" {% if current_filters.sort_by == 'created_at' %}selected{% endif %}>Älteste zuerst</option>
+                <option value="text" {% if current_filters.sort_by == 'text' %}selected{% endif %}>Text (A-Z)</option>
+                <option value="-text" {% if current_filters.sort_by == '-text' %}selected{% endif %}>Text (Z-A)</option>
+            </select>
+        </div>
+
+        <div class="flex items-end space-x-2">
+            <button type="submit" class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm transition duration-300">
+                Filtern
+            </button>
+            <a href="{% url 'my_questions' %}" class="w-full text-center py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md shadow-sm transition duration-300">
+                Zurücksetzen
+            </a>
+        </div>
+    </div>
+</form>
+
+<div class="space-y-4">
+    {% for status_code, group_data in grouped_questions.items %}
+        <details class="bg-white rounded-lg shadow overflow-hidden" open>
+            <summary class="p-4 cursor-pointer hover:bg-gray-50 flex justify-between items-center list-none">
+                <h2 class="text-xl font-semibold text-gray-700">
+                    {{ group_data.name }}
+                    <span class="ml-2 px-2.5 py-0.5 rounded-full text-sm font-medium
+                        {% if status_code == 'APPROVED' %} bg-green-100 text-green-800
+                        {% elif status_code == 'REJECTED' %} bg-red-100 text-red-800
+                        {% else %} bg-yellow-100 text-yellow-800
                         {% endif %}
                     ">
-                        {{ question.get_status_display }}
+                        {{ group_data.questions|length }}
                     </span>
-                    
-                    <!-- Edit button (only if PENDING) -->
-                    {% if question.status == 'PENDING' %}
-                        <a href="{% url 'update_question' question.pk %}" class="text-blue-600 hover:text-blue-800 transition duration-150">
-                            Bearbeiten
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </li>
-        {% empty %}
-        <li class="p-6 text-center text-gray-500">
-            Du hast noch keine Fragen eingereicht.
-        </li>
-        {% endfor %}
-    </ul>
+                </h2>
+                <span class="text-gray-400 transition-transform duration-200 transform details-arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </span>
+            </summary>
+            
+            <ul class="divide-y divide-gray-200 border-t border-gray-200">
+                {% for question in group_data.questions %}
+                <li class="p-6 hover:bg-gray-50 transition duration-150">
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1">
+                            <p class="text-lg font-semibold text-gray-900">{{ question.text }}</p>
+                            
+                            <p class="text-sm text-gray-500 mt-1">
+                                {% if question.course %}
+                                    <span class="font-medium">{{ question.course.name }}</span> | 
+                                {% endif %}
+                                Eingereicht am: {{ question.created_at|date:"d.m.Y" }}
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <span class="hidden px-3 py-1 text-sm font-medium rounded-full
+                                {% if question.status == 'APPROVED' %}
+                                    bg-green-100 text-green-800
+                                {% elif question.status == 'REJECTED' %}
+                                    bg-red-100 text-red-800
+                                {% else %}
+                                    bg-yellow-100 text-yellow-800
+                                {% endif %}
+                            ">
+                                {{ question.get_status_display }}
+                            </span>
+                            
+                            {% if question.status == 'PENDING' %}
+                                <a href="{% url 'update_question' question.pk %}" class="text-blue-600 hover:text-blue-800 transition duration-150">
+                                    Bearbeiten
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </details>
+    {% endfor %}
+
+    {% if total_questions_found == 0 %}
+        <div class="bg-white rounded-lg shadow p-6 text-center text-gray-500">
+            {% if current_filters.status or current_filters.course %}
+                Es wurden keine Fragen gefunden, die den Filterkriterien entsprechen.
+            {% else %}
+                Du hast noch keine Fragen eingereicht.
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
+
+<style>
+    details summary::-webkit-details-marker {
+        display: none;
+    }
+    details[open] .details-arrow {
+        transform: rotate(180deg);
+    }
+</style>
+
 {% endblock %}
