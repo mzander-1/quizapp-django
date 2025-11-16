@@ -1,105 +1,124 @@
 {% extends "quiz/base.html" %}
 
 {% block content %}
-<h1 class="text-3xl font-bold text-gray-800 mb-6">{{ page_title }}</h1>
+<h1 class="text-3xl font-bold text-text_heading mb-6">{{ page_title }}</h1>
 
 <form method="post" novalidate>
     {% csrf_token %}
     {{ answer_formset.management_form }}
 
-    <!-- Global Form Errors (z.B. "Nur 1 korrekte Antwort") -->
+    <!-- Global Form-Errors -->
     {% if question_form.non_field_errors or answer_formset.non_field_errors %}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6" role="alert">
+        <div class="bg-danger-100 border border-danger text-danger-800 px-4 py-3 rounded-md mb-6" role="alert">
             <strong class="font-bold">Fehler:</strong>
             <ul class="list-disc list-inside">
-                {% for error in question_form.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-                {% for error in answer_formset.non_field_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
+                {% for error in question_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                {% for error in answer_formset.non_field_errors %}<li>{{ error }}</li>{% endfor %}
             </ul>
         </div>
     {% endif %}
 
-
-    <!-- 1. Section: The Question itself -->
-    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 class="text-xl font-semibold mb-4">Frage</h2>
-
-        <!-- Course (if available) -->
-        <div class="mb-4">
-            <label for="{{ question_form.course.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ question_form.course.label }}
-            </label>
-            {{ question_form.course }}
-            {% if question_form.course.help_text %}
-            <p class="text-xs text-gray-500 mt-1">{{ question_form.course.help_text }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Question text -->
-        <div class="mb-4">
-            <label for="{{ question_form.text.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ question_form.text.label }}
-            </label>
-            {{ question_form.text }}
-            {% if question_form.text.errors %}
-                <p class="text-red-600 text-sm mt-1">{{ question_form.text.errors.as_text }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Explanation -->
-        <div>
-            <label for="{{ question_form.explanation.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                {{ question_form.explanation.label }}
-            </label>
-            {{ question_form.explanation }}
-        </div>
-    </div>
-
-
-    <!-- 2. Section: The Answers (FormSet) -->
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4">Antwortmöglichkeiten</h2>
-        <p class="text-sm text-gray-600 mb-4">Fülle mindestens eine Antwort aus und markiere genau eine davon als "Richtige Antowrt".</S>
+    <!-- 2-Column-Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <div class="space-y-4">
-            {% for form in answer_formset %}
-            <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-md">
-                <!-- Hidden ID field (important for FormSet) -->
-                {{ form.id }} 
-                
-                <!-- Text der Antwort -->
-                <div class="flex-grow">
-                    <label for="{{ form.text.id_for_label }}" class="sr-only">Antworttext</label>
-                    {{ form.text }}
-                    {% if form.text.errors %}
-                        <p class="text-red-600 text-sm mt-1">{{ form.text.errors.as_text }}</p>
-                    {% endif %}
-                </div>
-                
-                <!-- "Korrekt?" Checkbox -->
-                <div class="flex items-center">
-                    {{ form.is_correct }}
-                    <label for="{{ form.is_correct.id_for_label }}" class="ml-2 block text-sm font-medium text-gray-700">
-                        Richtige Antwort
+        <!-- Left Column: Question & Explanation -->
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold text-text_heading mb-4">Frage</h2>
+                <!-- Course -->
+                <div class="mb-4">
+                    <label for="{{ question_form.course.id_for_label }}" class="block text-sm font-medium text-text_default mb-1">
+                        {{ question_form.course.label }}
                     </label>
+                    {{ question_form.course }}
+                </div>
+                <!-- Question Text -->
+                <div class="mb-4">
+                    <label for="{{ question_form.text.id_for_label }}" class="block text-sm font-medium text-text_default mb-1">
+                        {{ question_form.text.label }}
+                    </label>
+                    {{ question_form.text }}
                 </div>
             </div>
-            {% endfor %}
+
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold text-text_heading mb-4">Erklärung</h2>
+                <!-- Explanation -->
+                <div>
+                    <label for="{{ question_form.explanation.id_for_label }}" class="block text-sm font-medium text-text_default mb-1">
+                        {{ question_form.explanation.label }}
+                    </label>
+                    {{ question_form.explanation }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Answers -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-text_heading mb-4">Antwortmöglichkeiten</h2>
+            <p class="text-sm text-gray-600 mb-4">Fülle mindestens eine Antwort aus und markiere genau eine davon als "Korrekt".</p>
+            
+            <div class="space-y-4">
+                {% for form in answer_formset %}
+                <div class="p-4 border border-gray-200 rounded-md bg-background">
+                    {{ form.id }} <!-- Important: Hidden ID field -->
+                    <!-- Answer Text -->
+                    <div class="mb-2">
+                        <label for="{{ form.text.id_for_label }}" class="block text-sm font-medium text-text_default mb-1">
+                            Antwort {{ forloop.counter }}
+                        </label>
+                        {{ form.text }}
+                        {% if form.text.errors %}
+                            <p class="text-danger text-sm mt-1">{{ form.text.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+                    <!-- "Correct?" Checkbox -->
+                    <div class="flex items-center">
+                        {{ form.is_correct }}
+                        <label for="{{ form.is_correct.id_for_label }}" class="ml-2 block text-sm font-medium text-text_default">
+                            Korrekt?
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
-    <!-- 3. Section: Save Button -->
+    <!-- Buttons -->
     <div class="mt-8 flex justify-end space-x-4">
-        <a href="{% url 'my_questions' %}" class="py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition duration-300">
+        <a href="{% url 'my_questions' %}" class="py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md transition duration-300 font-medium">
             Abbrechen
         </a>
-        <button type="submit" class="py-2 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-md transition duration-300">
+        <button type="submit" class="py-2 px-6 bg-primary hover:bg-opacity-90 text-white rounded-md shadow-md transition duration-300 font-medium">
             Speichern
         </button>
     </div>
-
 </form>
+
+<!-- Styling for the form widgets -->
+<style>
+    select, textarea, input[type="text"] {
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid #D1D5DB; /* gray-300 */
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    select:focus, textarea:focus, input[type="text"]:focus {
+        outline: none;
+        border-color: #1E5AA9; /* primary */
+        box-shadow: 0 0 0 2px rgba(30, 90, 169, 0.4);
+    }
+    input[type="checkbox"] {
+        height: 1rem;
+        width: 1rem;
+        border-radius: 0.25rem;
+        border-color: #D1D5DB; /* gray-300 */
+        color: #1E5AA9; /* primary */
+        focus:ring-primary;
+    }
+</style>
 {% endblock %}

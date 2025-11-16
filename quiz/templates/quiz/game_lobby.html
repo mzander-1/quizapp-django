@@ -1,18 +1,18 @@
 {% extends "quiz/base.html" %}
 
 {% block content %}
-<div class="text-center">
-    <p class="text-lg text-gray-600">Spiel-Lobby für</p>
-    <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ game_session.course.name }}</h1>
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
+    <p class="text-lg text-text_default">Spiel-Lobby für</p>
+    <h1 class="text-4xl font-bold text-text_heading mb-4">{{ game_session.course.name }}</h1>
     
-    <p class="text-2xl text-gray-700 mb-2">Spiel-Code:</p>
-    <div class="inline-block bg-gray-200 px-8 py-4 rounded-lg shadow-inner mb-8">
-        <p class="text-5xl font-mono tracking-widest text-blue-700">{{ game_session.join_code }}</p>
+    <p class="text-2xl text-text_default mb-2">Spiel-Code:</p>
+    <div class="inline-block bg-box_bg px-8 py-4 rounded-lg shadow-inner mb-8">
+        <p class="text-5xl font-mono tracking-widest text-primary">{{ game_session.join_code }}</p>
     </div>
 
-    <h2 class="text-2xl font-semibold mb-4">Teilnehmer:</h2>
+    <h2 class="text-2xl font-semibold text-text_heading mb-4">Teilnehmer</h2>
 
-    <!-- Polling of the participant list every 3 seconds -->
+    <!-- Polling of the participant list -->
     <div id="participant-list" 
          hx-get="{% url 'poll_lobby' game_session.join_code %}" 
          hx-trigger="every 3s"
@@ -23,17 +23,16 @@
     </div>
 
 
-    <!-- Game-Start-Button -->
+    <!-- Game Start Button OR Waiting Poller -->
     {% if is_host %}
         <form action="{% url 'start_game' game_session.join_code %}" method="post">
             {% csrf_token %}
-            <button type="submit" class="w-full max-w-md mx-auto py-3 px-6 bg-green-600 hover:bg-green-700 text-white text-xl font-bold rounded-md shadow-lg transition duration-300">
+            <button type="submit" class="w-full py-3 px-6 bg-success hover:bg-opacity-90 text-white text-xl font-bold rounded-md shadow-lg transition duration-300">
                 Spiel starten!
             </button>
         </form>
         <p class="text-sm text-gray-500 mt-2">Nur der Host (Spielersteller) kann das Spiel starten.</p>
     {% else %}
-        <!-- Polling to check if the game has started every 3 seconds -->
         <div hx-get="{% url 'poll_game_start' game_session.join_code %}" 
              hx-trigger="every 3s">
         </div>

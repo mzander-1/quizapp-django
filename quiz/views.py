@@ -462,13 +462,21 @@ def game_state_poller(request, join_code):
         all_questions = list(
             game_session.questions.order_by("id").values_list("id", flat=True)
         )
+        progress_percentage = 0  # Default value
+
         try:
             current_index = all_questions.index(current_question.id)
             question_number = current_index + 1
             total_questions = len(all_questions)
+
+            # Calculate percentage in the view
+            if total_questions > 0:
+                progress_percentage = ((question_number - 1) * 100) / total_questions
+
         except (ValueError, AttributeError):
             question_number = "?"
             total_questions = "?"
+            progress_percentage = 0  # Fallback
 
         return render(
             request,
@@ -478,6 +486,7 @@ def game_state_poller(request, join_code):
                 "question": current_question,
                 "question_number": question_number,
                 "total_questions": total_questions,
+                "progress_percentage": progress_percentage,  # <-- Pass the new variable
             },
         )
 

@@ -1,30 +1,69 @@
-<form hx-swap="innerHTML" hx-target="#game-state">
-    <div class="bg-white p-8 rounded-lg shadow-md transition-all duration-300">
-        {% csrf_token %}
-        
-        {% if team_answer.is_correct %}
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                <p class="font-bold text-xl">Richtig!</p>
-                <p>"{{ team_answer.selected_answer.text }}" war die korrekte Antwort. (Beantwortet von {{ answered_by_user }})</p>
-            </div>
-        {% else %}
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-                <p class="font-bold text-xl">Falsch!</p>
-                <p>Eure Antwort: "{{ team_answer.selected_answer.text }}" (Beantwortet von {{ answered_by_user }})</V>
-            </div>
-        {% endif %}
+<div class="transition-all duration-300">
+    
+    <!-- Question Text (for reference) -->
+    <h2 class="text-2xl font-bold text-text_heading mb-6">
+        {{ question.text }}
+    </h2>
 
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">{{ question.text }}</h2>
-        <div class="prose max-w-none p-4 bg-gray-50 rounded-md border border-gray-200">
+    <!-- Answers Grid with Correct/Incorrect Styling -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {% for answer in question.answers.all %}
+            <div class="p-4 rounded-lg border-2
+                {% if answer.is_correct %}
+                    border-success bg-success-100 text-success-800
+                {% elif answer.pk == team_answer.selected_answer.pk %}
+                    border-danger bg-danger-100 text-danger-800
+                {% else %}
+                    border-gray-300 bg-gray-100 text-gray-500
+                {% endif %}
+            ">
+                <span class="text-lg font-medium">{{ forloop.counter }}. {{ answer.text }}</span>
+                
+                {% if answer.is_correct %}
+                    <span class="font-bold ml-2">(Richtig)</span>
+                {% elif answer.pk == team_answer.selected_answer.pk %}
+                    <span class="font-bold ml-2">(Deine Antwort)</span>
+                {% endif %}
             </div>
-
-
-        <div class="mt-8 text-center">
-            <button 
-                class="w-full max-w-md mx-auto py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold rounded-md shadow-lg transition duration-300"
-                hx-post="{% url 'next_question' game_session.join_code %}">
-                Nächste Frage
-            </button>
-        </div>
+        {% endfor %}
     </div>
-</form>
+
+    <!-- Result Summary -->
+    <div class="mb-6">
+    {% if team_answer.is_correct %}
+        <div class="bg-success-100 border-l-4 border-success text-success-800 p-4" role="alert">
+            <p class="font-bold text-xl">Richtig!</p>
+            <p>Beantwortet von {{ answered_by_user }}.</p>
+        </div>
+    {% else %}
+        <div class="bg-danger-100 border-l-4 border-danger text-danger-800 p-4" role="alert">
+            <p class="font-bold text-xl">Falsch!</p>
+            <p>Beantwortet von {{ answered_by_user }}.</p>
+        </div>
+    {% endif %}
+    </div>
+
+    <!-- Explanation -->
+    <div class="prose max-w-none p-4 bg-box_bg rounded-md border border-gray-200 mb-8">
+        <h3 class="text-lg font-semibold text-text_heading mb-2">Erklärung:</h3>
+        {% if question.explanation %}
+            <p class="text-text_default">{{ question.explanation|linebreaksbr }}</p>
+        {% else %}
+            <p class="italic text-gray-500">Für diese Frage wurde keine Erklärung hinterlegt.</p>
+        {% endif %}
+    </div>
+
+    <!-- "Next Question" Button -->
+    <div class="text-center">
+        {% csrf_token %}
+        <button 
+            class="w-full max-w-md mx-auto py-3 px-6 bg-primary hover:bg-opacity-90 text-white text-xl font-bold rounded-md shadow-lg transition duration-300"
+            hx-post="{% url 'next_question' game_session.join_code %}"
+            hx-target="#game-state"
+            hx-swap="innerHTML"
+            hx-include="[name='csrfmiddlewaretoken']">
+            
+            Nächste Frage
+        </button>
+    </div>
+</div>

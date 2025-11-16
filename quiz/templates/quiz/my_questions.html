@@ -2,18 +2,19 @@
 
 {% block content %}
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Meine eingereichten Fragen</h1>
-    <a href="{% url 'create_question' %}" class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-md transition duration-300">
+    <h1 class="text-3xl font-bold text-text_heading">Meine eingereichten Fragen</h1>
+    <a href="{% url 'create_question' %}" class="py-2 px-4 bg-primary hover:bg-opacity-90 text-white rounded-md shadow-md transition duration-300 font-medium">
         + Neue Frage erstellen
     </a>
 </div>
 
-<form method="GET" action="{% url 'my_questions' %}" class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+<!-- Filter -->
+<form method="GET" action="{% url 'my_questions' %}" class="mb-6 p-4 bg-white rounded-lg shadow-md border border-gray-200">
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         
         <div>
-            <label for="course" class="block text-sm font-medium text-gray-700">Kurs:</label>
-            <select name="course" id="course" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <label for="course" class="block text-sm font-medium text-text_default">Kurs:</label>
+            <select name="course" id="course" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
                 <option value="">Alle Kurse</option>
                 {% for course in all_courses %}
                     <option value="{{ course.pk }}" {% if current_filters.course == course.pk|stringformat:"s" %}selected{% endif %}>
@@ -24,8 +25,8 @@
         </div>
 
         <div>
-            <label for="status" class="block text-sm font-medium text-gray-700">Status:</label>
-            <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <label for="status" class="block text-sm font-medium text-text_default">Status:</label>
+            <select name="status" id="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
                 <option value="">Alle Stati</option>
                 {% for code, name in status_choices %}
                     <option value="{{ code }}" {% if current_filters.status == code %}selected{% endif %}>
@@ -36,8 +37,8 @@
         </div>
 
         <div>
-            <label for="sort_by" class="block text-sm font-medium text-gray-700">Sortieren nach:</label>
-            <select name="sort_by" id="sort_by" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <label for="sort_by" class="block text-sm font-medium text-text_default">Sortieren nach:</label>
+            <select name="sort_by" id="sort_by" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
                 <option value="-created_at" {% if current_filters.sort_by == '-created_at' %}selected{% endif %}>Neueste zuerst</option>
                 <option value="created_at" {% if current_filters.sort_by == 'created_at' %}selected{% endif %}>Älteste zuerst</option>
                 <option value="text" {% if current_filters.sort_by == 'text' %}selected{% endif %}>Text (A-Z)</option>
@@ -46,80 +47,76 @@
         </div>
 
         <div class="flex items-end space-x-2">
-            <button type="submit" class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow-sm transition duration-300">
+            <button type="submit" class="w-full py-2 px-4 bg-primary hover:bg-opacity-90 text-white rounded-md shadow-sm font-medium transition duration-300">
                 Filtern
             </button>
-            <a href="{% url 'my_questions' %}" class="w-full text-center py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md shadow-sm transition duration-300">
+            <a href="{% url 'my_questions' %}" class="w-full text-center py-2 px-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md shadow-sm font-medium transition duration-300">
                 Zurücksetzen
             </a>
         </div>
     </div>
 </form>
 
+<!-- Collapsible Sections -->
 <div class="space-y-4">
     {% for status_code, group_data in grouped_questions.items %}
-        <details class="bg-white rounded-lg shadow overflow-hidden" open>
+        <details class="bg-white rounded-lg shadow overflow-hidden" {% if status_code == 'PENDING' %}open{% endif %}>
+            <!-- Header of Section -->
             <summary class="p-4 cursor-pointer hover:bg-gray-50 flex justify-between items-center list-none">
-                <h2 class="text-xl font-semibold text-gray-700">
-                    {{ group_data.name }}
-                    <span class="ml-2 px-2.5 py-0.5 rounded-full text-sm font-medium
-                        {% if status_code == 'APPROVED' %} bg-green-100 text-green-800
-                        {% elif status_code == 'REJECTED' %} bg-red-100 text-red-800
-                        {% else %} bg-yellow-100 text-yellow-800
-                        {% endif %}
-                    ">
-                        {{ group_data.questions|length }}
+                <div class="flex items-center">
+                    <span class="text-gray-400 transition-transform duration-200 transform details-arrow mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
                     </span>
-                </h2>
-                <span class="text-gray-400 transition-transform duration-200 transform details-arrow">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                </span>
+                    <h2 class="text-xl font-semibold text-text_heading">
+                        {{ group_data.name }}
+                        <span class="ml-2 px-2.5 py-0.5 rounded-full text-sm font-medium
+                            {% if status_code == 'APPROVED' %} bg-success-100 text-success-800
+                            {% elif status_code == 'REJECTED' %} bg-danger-100 text-danger-800
+                            {% else %} bg-warning-100 text-warning-800
+                            {% endif %}
+                        ">
+                            {{ group_data.questions|length }}
+                        </span>
+                    </h2>
+                </div>
             </summary>
             
+            <!-- Content of Section (List of Questions) -->
             <ul class="divide-y divide-gray-200 border-t border-gray-200">
                 {% for question in group_data.questions %}
                 <li class="p-6 hover:bg-gray-50 transition duration-150">
                     <div class="flex justify-between items-center">
-                        <div class="flex-1">
-                            <p class="text-lg font-semibold text-gray-900">{{ question.text }}</p>
-                            
+                        <div class="flex-1 pr-4">
+                            <p class="text-lg font-semibold text-text_default">{{ question.text }}</p>
                             <p class="text-sm text-gray-500 mt-1">
                                 {% if question.course %}
-                                    <span class="font-medium">{{ question.course.name }}</span> | 
+                                    <span class="font-medium text-text_default">{{ question.course.name }}</span> | 
                                 {% endif %}
                                 Eingereicht am: {{ question.created_at|date:"d.m.Y" }}
                             </p>
 
                             {% if question.status == 'REJECTED' and question.rejection_reason %}
-                            <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
-                                <p class="text-sm font-medium text-red-800">Begründung für Ablehnung:</p>
-                                <p class="text-sm text-red-700 mt-1">{{ question.rejection_reason|linebreaksbr }}</p>
+                            <div class="mt-3 p-3 bg-danger-100 border border-danger rounded-md">
+                                <p class="text-sm font-medium text-danger-800">Begründung für Ablehnung:</p>
+                                <p class="text-sm text-danger-800 mt-1">{{ question.rejection_reason|linebreaksbr }}</p>
                             </div>
                             {% endif %}
-                            </div>
+                        </div>
                         
-                        <div class="flex items-center space-x-4">
-                            <span class="hidden px-3 py-1 text-sm font-medium rounded-full
-                                {% if question.status == 'APPROVED' %}
-                                    bg-green-100 text-green-800
-                                {% elif question.status == 'REJECTED' %}
-                                    bg-red-100 text-red-800
-                                {% else %}
-                                    bg-yellow-100 text-yellow-800
-                                {% endif %}
-                            ">
-                                {{ question.get_status_display }}
-                            </span>
-                            
+                        <div class="flex-shrink-0">
                             {% if question.status == 'PENDING' %}
-                                <a href="{% url 'update_question' question.pk %}" class="text-blue-600 hover:text-blue-800 transition duration-150">
+                                <a href="{% url 'update_question' question.pk %}" class="py-2 px-3 bg-gray-100 hover:bg-gray-200 text-text_default rounded-md text-sm font-medium transition duration-150">
                                     Bearbeiten
                                 </a>
                             {% endif %}
                         </div>
                     </div>
+                </li>
+                {% empty %}
+                <li class="p-6 text-center text-gray-500">
+                    Keine Fragen in dieser Kategorie gefunden.
                 </li>
                 {% endfor %}
             </ul>
@@ -138,12 +135,8 @@
 </div>
 
 <style>
-    details summary::-webkit-details-marker {
-        display: none;
-    }
-    details[open] .details-arrow {
-        transform: rotate(180deg);
-    }
+    details summary::-webkit-details-marker { display: none; }
+    details[open] .details-arrow { transform: rotate(180deg); }
 </style>
 
 {% endblock %}

@@ -1,34 +1,43 @@
 {% extends "quiz/base.html" %}
 
 {% block content %}
-    <h1 class="text-3xl font-bold mb-6 text-center">Login</h1>
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
+    <h1 class="text-3xl font-bold text-text_heading mb-6 text-center">Anmelden</h1>
 
     {% if form.errors %}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+        <div class="bg-danger-100 border border-danger text-danger-800 px-4 py-3 rounded-lg relative mb-6" role="alert">
             <strong class="font-bold">Fehler!</strong>
             <span class="block sm:inline">Benutzername oder Passwort war falsch. Bitte versuche es erneut.</span>
         </div>
     {% endif %}
 
-    <form method="post" action="{% url 'login' %}" class="max-w-md mx-auto">
+    <form method="post" action="{% url 'login' %}" class="space-y-6">
         {% csrf_token %}
         
-        <div class="mb-4">
-            <label for="id_username" class="block text-gray-700 font-bold mb-2">Benutzername:</label>
+        <div>
+            <label for="id_username" class="block text-sm font-medium text-text_default">Benutzername:</label>
             <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required
-                   id="id_username" class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
-        </div>
-        
-        <div class="mb-6">
-            <label for="id_password" class="block text-gray-700 font-bold mb-2">Passwort:</label>
-            <input type="password" name="password" autocomplete="current-password" required
-                   id="id_password" class="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                   id="id_username" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
         </div>
         
         <div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300">
-                Einloggen
+            <label for="id_password" class="block text-sm font-medium text-text_default">Passwort:</label>
+            <input type="password" name="password" autocomplete="current-password" required
+                   id="id_password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+        </div>
+        
+        <div>
+            <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-opacity-90 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Anmelden
             </button>
         </div>
     </form>
+    
+    <p class="mt-6 text-center text-sm text-text_default">
+        Noch kein Konto?
+        <a href="{% url 'register' %}" class="font-medium text-primary hover:text-opacity-80">
+            Jetzt registrieren
+        </a>
+    </p>
+</div>
 {% endblock %}
