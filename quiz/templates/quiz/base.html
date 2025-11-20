@@ -1,70 +1,150 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uni Quiz App</title>
+    <title>IU Quiz App</title>
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10" xintegrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLFe8MHPZQ" crossorigin="anonymous"></script>
+    
+    <!-- Alpine.js (für Dropdowns oder interaktive UI-Elemente, falls benötigt) -->
+    <script src="//unpkg.com/alpinejs" defer></script>
+    
+    <!-- Tailwind Konfiguration mit der neuen Farbpalette -->
     <script>
         tailwind.config = {
             theme: {
-                fontFamily: {
-                    'sans': ['Inter', 'sans-serif'],
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'background': '#F4F6FA',
+                        'primary': '#1E5AA9',
+                        'secondary': '#0F2E5A',
+                        'accent': '#1CC8A0',
+                        'success': {
+                            DEFAULT: '#28A745',
+                            '100': '#EAF6EC', // Light green
+                            '800': '#1A6C2E', // Dark green text
+                        },
+                        'danger': {
+                            DEFAULT: '#E63946',
+                            '100': '#FCECEE', // Light red
+                            '800': '#9B242E', // Dark red text
+                        },
+                        'warning': {
+                            DEFAULT: '#FFC107',
+                            '100': '#FFF8E1', // Light yellow
+                            '800': '#A67E04', // Dark yellow text
+                        },
+                        'text_heading': '#0C2340',
+                        'text_default': '#2E2E2E',
+                        'box_bg': '#E3E8EF',
+                    }
                 }
             }
         }
     </script>
+    
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif;
+            background-color: #F4F6FA; /* Fällt auf 'bg-background' zurück */
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="h-full flex flex-col">
 
-    <!-- Navbar -->
-     <nav class="bg-white shadow-md">
-        <div class="max-w-6x1 mx-auto px-4">
-            <div class="flex justify-between">
-                <div class="flex space-x-7">
-                    <!-- logo -->
-                     <div>
-                        <a href="{% url 'home' %}" class="flex items-center py-4 px-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13.5M12 6.253c-1.21 0-2.39-.188-3.5-.52M12 6.253c1.21 0 2.39-.188 3.5-.52M12 6.253V3.75c0-.621-.504-1.125-1.125-1.125H11.25c-.621 0-1.125.504-1.125 1.125V6.253M12 6.253c-1.465 0-2.858.188-4.25.52m4.25-.52c1.465 0 2.858.188 4.25.52M4.5 8.25c0-1.21.188-2.39.52-3.5M4.5 8.25V11.25c0 .621.504 1.125 1.125 1.125H6.75c.621 0 1.125-.504 1.125-1.125V8.25M4.5 8.25c1.21 0 2.39.188 3.5.52M19.5 8.25c0-1.21-.188-2.39-.52-3.5M19.5 8.25V11.25c0 .621-.504 1.125-1.125 1.125H17.25c-.621 0-1.125-.504-1.125-1.125V8.25M19.5 8.25c-1.21 0-2.39.188-3.5.52" />
-                            </svg>
-                            <span class="font-semibold text-gray-700 text-lg">Uni Quiz</span>
-                        </a>
-                     </div>
+    <!-- Neue Navigationsleiste (Header) -->
+    <nav class="bg-secondary text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Haupt-Links -->
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="flex-shrink-0 flex items-center">
+                        <!-- IU Logo (Text-Platzhalter) -->
+                        <span class="font-bold text-2xl tracking-wider">IU</span>
+                        <span class="font-light text-2xl ml-2">Quiz App</span>
+                    </a>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'home' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                    <!-- Heroicon: play -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block -mt-1 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A.5.5 0 008 7.636v4.728a.5.5 0 00.777.416l3.9-2.364a.5.5 0 000-.832l-3.9-2.364a.5.5 0 00-.222-.05z" clip-rule="evenodd" /></svg>
+                                    Quiz starten
+                                </a>
+                                <a href="{% url 'my_questions' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                    <!-- Heroicon: light-bulb -->
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block -mt-1 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM5.757 15.657a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM5 10a1 1 0 011-1h1a1 1 0 110 2H6a1 1 0 01-1-1zM10 15a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zM14.243 15.657a1 1 0 001.414-1.414l-.707-.707a1 1 0 10-1.414 1.414l.707.707zM15 10a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zM7 10a1 1 0 011-1h1a1 1 0 110 2H8a1 1 0 01-1-1zM7.757 4.343a1 1 0 00-1.414 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707zM10 5a1 1 0 01-1 1H7a1 1 0 110-2h2a1 1 0 011 1z" /></svg>
+                                    Fragen erstellen
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-                <!-- Right Aligned Links -->
-                <div class="flex items-center space-x-3">
-                    {% if user.is_authenticated %}
-                        <span class="py-4 px-2 text-gray-500">Hi, {{ user.username }}</span>
-                        <a href="{% url 'my_questions' %}" class="py-4 px-2 text-gray-500 hover:text-blue-600 transition duration-300">Meine Fragen</a>
-                        <form method="post" action="{% url 'logout' %}" class="inline">
-                            {% csrf_token %}
-                            <button type="submit" class="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-300 cursor-pointer">
-                                Logout
-                            </button>
-                        </form>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="py-4 px-2 text-gray-500 hover:text-blue-600 transition duration-300">Login</a>
-                        <a href="{% url 'register' %}" class="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-300">Registrieren</a>
-                    {% endif %}
+                
+                <!-- Profil / Login / Logout -->
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        {% if user.is_authenticated %}
+                            <!-- Profil-Dropdown -->
+                            <div x-data="{ open: false }" class="ml-3 relative">
+                                <div>
+                                    <button @click="open = !open" type="button" class="max-w-xs bg-secondary rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                        <span class="sr-only">User menu</span>
+                                        <!-- User Icon -->
+                                        <span class="inline-block h-8 w-8 rounded-full overflow-hidden bg-gray-700">
+                                            <svg class="h-full w-full text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                            </svg>
+                                        </span>
+                                        <span class="text-white ml-2 text-sm font-medium">{{ user.username }}</span>
+                                        <!-- Chevron -->
+                                        <svg class="h-5 w-5 text-gray-400 ml-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                </div>
+                                <div x-show="open" @click.away="open = false"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                     x-transition:leave-end="transform opacity-0 scale-95"
+                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" 
+                                     role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
+                                    
+                                    <form method="post" action="{% url 'logout' %}" class="inline" role="menuitem">
+                                        {% csrf_token %}
+                                        <button type="submit" class="w-full text-left block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            Logout
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Anmelden</a>
+                            <a href="{% url 'register' %}" class="ml-4 text-secondary bg-white hover:bg-gray-100 px-3 py-2 rounded-md text-sm font-medium">Registrieren</a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>" 
-     </nav>"
+        </div>
+    </nav>
 
     <!-- Flash Messages -->
     {% if messages %}
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
             {% for message in messages %}
-            <div class="rounded-md p-4
-                {% if message.tags == 'success' %} bg-green-100 border border-green-300 text-green-800
-                {% elif message.tags == 'error' %} bg-red-100 border border-red-300 text-red-800
-                {% else %} bg-blue-100 border border-blue-300 text-blue-800
+            <div class="rounded-md p-4 
+                {% if message.tags == 'success' %} bg-success-100 border border-success text-success-800
+                {% elif message.tags == 'error' %} bg-danger-100 border border-danger text-danger-800
+                {% else %} bg-warning-100 border border-warning text-warning-800
                 {% endif %}"
                 role="alert">
                 <p>{{ message }}</p>
@@ -74,14 +154,17 @@
     {% endif %}
 
     <!-- Main Content -->
-    <main class="max-w-6x1 mx-auto p-8">
-        <div class="bg-white p-8 rounded-lg shadow-md">
+    <main class="flex-grow">
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- 
+              Das `bg-white` wird jetzt IN den Kind-Templates gesteuert,
+              damit wir mehr Flexibilität für das Layout haben.
+            -->
             {% block content %}
                 <!-- Content will be injected here -->
             {% endblock %}
         </div>
     </main>
-
     
 </body>
 </html>

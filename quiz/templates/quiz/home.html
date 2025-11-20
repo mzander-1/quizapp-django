@@ -1,25 +1,28 @@
 {% extends "quiz/base.html" %}
 
 {% block content %}
-<h1 class="text-3xl font-bold text-gray-800 mb-6">Willkommen, {{ user.username }}!</h1>
+<div class="bg-white p-8 rounded-lg shadow-md mb-8">
+    <h1 class="text-3xl font-bold text-text_heading mb-2">Willkommen, {{ user.username }}!</h1>
+    <p class="text-lg text-text_default">Was möchtest du als Nächstes tun?</p>
+</div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-    <!-- Left Column: Create / Join Game -->
+    
+    <!-- Left Column: Create game / Join game -->
     <div class="space-y-8">
         
         <!-- Create Game -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold mb-4">Neues Spiel erstellen</h2>
-            <form action="{% url 'create_game' %}" method="post">
+            <h2 class="text-2xl font-semibold text-text_heading mb-4">Neues Spiel erstellen</h2>
+            <form action="{% url 'create_game' %}" method="post" class="space-y-4">
                 {% csrf_token %}
-                <div class="mb-4">
-                    <label for="{{ create_form.course.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                <div>
+                    <label for="{{ create_form.course.id_for_label }}" class="block text-sm font-medium text-text_default mb-1">
                         {{ create_form.course.label }}
                     </label>
                     {{ create_form.course }}
                 </div>
-                <button type="submit" class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md shadow transition duration-300">
+                <button type="submit" class="w-full py-3 px-4 rounded-md shadow-sm text-base font-medium text-white bg-primary hover:bg-opacity-90 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                     Spiel-Lobby erstellen
                 </button>
             </form>
@@ -27,16 +30,16 @@
 
         <!-- Join Game -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold mb-4">Spiel beitreten</h2>
-            <form action="{% url 'join_game' %}" method="post">
+            <h2 class="text-2xl font-semibold text-text_heading mb-4">Spiel beitreten</h2>
+            <form action="{% url 'join_game' %}" method="post" class="space-y-4">
                 {% csrf_token %}
-                <div class="mb-4">
-                    <label for="{{ join_form.join_code.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                <div>
+                    <label for="{{ join_form.join_code.id_for_label }}" class="block text-sm font-medium text-text_default mb-1">
                         {{ join_form.join_code.label }}
                     </label>
                     {{ join_form.join_code }}
                 </div>
-                <button type="submit" class="w-full py-2 px-4 bg-gray-700 hover:bg-gray-800 text-white rounded-md shadow transition duration-300">
+                <button type="submit" class="w-full py-3 px-4 rounded-md shadow-sm text-base font-medium text-white bg-gray-700 hover:bg-gray-800 transition duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700">
                     Lobby beitreten
                 </button>
             </form>
@@ -46,16 +49,16 @@
 
     <!-- Right Column: Active Lobbies -->
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-2xl font-semibold mb-4">Meine aktiven Lobbies</h2>
+        <h2 class="text-2xl font-semibold text-text_heading mb-4">Meine aktiven Lobbies</h2>
         {% if active_sessions %}
             <ul class="divide-y divide-gray-200">
                 {% for session in active_sessions %}
                 <li class="py-4 flex justify-between items-center">
                     <div>
-                        <p class="text-lg font-medium text-blue-700">Code: {{ session.join_code }}</p>
-                        <p class="text-sm text-gray-600">Kurs: {{ session.course.name }}</p>
+                        <p class="text-lg font-medium text-primary">Code: {{ session.join_code }}</p>
+                        <p class="text-sm text-text_default">Kurs: {{ session.course.name }}</p>
                     </div>
-                    <a href="{% url 'game_lobby' session.join_code %}" class="py-2 px-3 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm transition duration-300">
+                    <a href="{% url 'game_lobby' session.join_code %}" class="py-2 px-3 bg-success hover:bg-opacity-90 text-white rounded-md text-sm font-medium transition duration-300">
                         Wieder beitreten
                     </a>
                 </li>
@@ -65,6 +68,23 @@
             <p class="text-gray-500">Du bist derzeit in keiner aktiven Lobby.</p>
         {% endif %}
     </div>
-
 </div>
+
+<!-- Form Styling for this page -->
+<style>
+    select, input[type="text"] {
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        border: 1px solid #D1D5DB; /* gray-300 */
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    select:focus, input[type="text"]:focus {
+        outline: none;
+        border-color: #1E5AA9; /* primary */
+        box-shadow: 0 0 0 2px rgba(30, 90, 169, 0.4);
+    }
+</style>
 {% endblock %}
