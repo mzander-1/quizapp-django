@@ -15,7 +15,9 @@ SECRET_KEY = "django-insecure-phbt3bu%4^%ok1y_in5s#k^*#-!)jpfa&-+vwc4n-b*_-3zbzj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "quizapp-mzander.pythonanywhere.com",
+]
 
 
 # Application definition
@@ -112,6 +114,7 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
