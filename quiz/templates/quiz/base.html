@@ -11,10 +11,10 @@
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10" xintegrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLFe8MHPZQ" crossorigin="anonymous"></script>
     
-    <!-- Alpine.js (für Dropdowns oder interaktive UI-Elemente, falls benötigt) -->
+    <!-- Alpine.js (for Dropdowns or interactive UI elements, if needed) -->
     <script src="//unpkg.com/alpinejs" defer></script>
     
-    <!-- Tailwind Konfiguration mit der neuen Farbpalette -->
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
@@ -60,15 +60,15 @@
 </head>
 <body class="h-full flex flex-col">
 
-    <!-- Neue Navigationsleiste (Header) -->
+    <!-- Navigationbar (Header) -->
     <nav class="bg-secondary text-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Logo & Haupt-Links -->
+                <!-- Logo & Main-Links -->
                 <div class="flex items-center">
                     <a href="{% url 'home' %}" class="flex-shrink-0 flex items-center">
-                        <!-- IU Logo (Text-Platzhalter) -->
-                        <span class="font-bold text-2xl tracking-wider">IU</span>
+                        <!-- IU Logo (Text-Placeholder) -->
+                        <span class="font-bold text-6xl tracking-wider">iu</span>
                         <span class="font-light text-2xl ml-2">Quiz App</span>
                     </a>
                     <div class="hidden md:block">
@@ -156,10 +156,7 @@
     <!-- Main Content -->
     <main class="flex-grow">
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <!-- 
-              Das `bg-white` wird jetzt IN den Kind-Templates gesteuert,
-              damit wir mehr Flexibilität für das Layout haben.
-            -->
+
             {% block content %}
                 <!-- Content will be injected here -->
             {% endblock %}
