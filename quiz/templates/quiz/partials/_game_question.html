@@ -1,23 +1,37 @@
-<form hx-swap="innerHTML" hx-target="#game-state">
-    <div class="bg-white p-8 rounded-lg shadow-md transition-all duration-300">
-        {% csrf_token %} <p class="text-sm text-gray-500 mb-2">Frage {{ question_number }} von {{ total_questions }}</p>
-        
-        <h2 class="text-3xl font-bold text-gray-800 mb-8">
-            {{ question.text }}
-        </h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% for answer in question.answers.all %}
-            <button 
-                class="w-full text-left p-4 rounded-md border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                hx-post="{% url 'submit_answer' game_session.join_code answer.pk %}">
-                <span class="text-lg text-gray-700">{{ answer.text }}</span>
-            </button>
-            {% endfor %}
-        </div>
-
-        <p class="text-center text-gray-500 mt-8 text-sm">
-            (Koop-Modus: Die erste Antwort zählt für das ganze Team!)
-        </p>
+<div class="transition-all duration-300">
+    <div class="flex justify-between items-baseline mb-4">
+        <h2 class="text-2xl font-bold text-text_heading">Frage</h2>
+        <p class="text-lg text-text_default">{{ question_number }} / {{ total_questions }}</p>
     </div>
-</form>
+    
+    <!-- Completionbar -->
+    <div class="bg-box_bg rounded-full h-2.5 mb-6">
+        <div class="bg-accent h-2.5 rounded-full" style="width: {{ progress_percentage }}%"></div>
+    </div>
+    
+    <!-- Question Text -->
+    <p class="text-xl text-text_default mb-8" style="min-height: 5rem;">
+        {{ question.text }}
+    </p>
+
+    <!-- Answers -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% csrf_token %}
+
+        {% for answer in question.answers.all %}
+        <button 
+            class="w-full text-left p-4 rounded-lg border-2 border-gray-300 bg-white hover:border-primary hover:bg-primary/10 transition duration-150 focus:outline-none focus:ring-2 focus:ring-primary/50"
+            hx-post="{% url 'submit_answer' game_session.join_code answer.pk %}"
+            hx-target="#game-state"
+            hx-swap="innerHTML"
+            hx-include="[name='csrfmiddlewaretoken']">
+            
+            <span class="text-lg text-text_default">{{ forloop.counter }}. {{ answer.text }}</span>
+        </button>
+        {% endfor %}
+    </div>
+
+    <p class="text-center text-gray-500 mt-8 text-sm">
+        (Koop-Modus: Die erste Antwort zählt für das ganze Team!)
+    </p>
+</div>

@@ -1,34 +1,31 @@
 {% extends "quiz/base.html" %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto text-center">
-    <h1 class="text-4xl font-bold text-gray-800 mb-4">Spiel beendet!</h1>
-    <p class="text-xl text-gray-600 mb-8">
+<div class="max-w-2xl mx-auto text-center bg-white p-8 rounded-lg shadow-md">
+    <h1 class="text-4xl font-bold text-text_heading mb-4">Spiel beendet!</h1>
+    <p class="text-xl text-text_default mb-8">
         Kurs: {{ game_session.course.name }}
     </p>
 
-    <div class="bg-white p-8 rounded-lg shadow-md">
-        <h2 class="text-2xl font-semibold mb-6">Finale Punktzahl (Team)</h2>
-        
-        {% with first_participant=game_session.participants.first %}
-            <p class="text-6xl font-bold text-blue-600 mb-6">
-                {{ first_participant.score }} Punkte
-            </p>
-        {% endwith %}
+    <h2 class="text-2xl font-semibold text-text_heading mb-6">Finale Punktzahl (Team)</h2>
+    
+    {% with first_participant=game_session.participants.first %}
+        <p class="text-6xl font-bold text-primary mb-8">
+            {{ first_participant.score }} Punkte
+        </p>
+    {% endwith %}
 
-        <h3 class="text-xl font-semibold mb-4">Teilnehmer:</h3>
-        <ul class="divide-y divide-gray-200">
-            {% for participant in game_session.participants.all %}
-            <li class="py-3 text-lg text-gray-700">
-                {{ participant.user.username }} (Score: {{ participant.score }})
-            </li>
-            {% endfor %}
-        </ul>
-        
-        <a href="{% url 'home' %}" class="mt-8 inline-block py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium rounded-md shadow-md transition duration-300">
-            Zurück zur Homepage
-        </a>
-    </div>
+    <h3 class="text-xl font-semibold text-text_heading mb-4">Teilnehmer:</h3>
+    <ul class="divide-y divide-gray-200 max-w-md mx-auto">
+        {% for participant in game_session.participants.all %}
+        <li class="py-3 text-lg text-text_default">
+            {{ participant.user.username }} (Score: {{ participant.score }})
+        </li>
+        {% endfor %}
+    </ul>
+    
+    <a href="{% url 'home' %}" class="mt-10 inline-block py-3 px-6 bg-primary hover:bg-opacity-90 text-white text-lg font-medium rounded-md shadow-md transition duration-300">
+        Zurück zur Homepage
+    </a>
 </div>
 {% endblock %}
-
