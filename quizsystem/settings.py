@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-phbt3bu%4^%ok1y_in5s#k^*#-!)jpfa&-+vwc4n-b*_-3zbzj"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "quizapp-mzander.pythonanywhere.com",
