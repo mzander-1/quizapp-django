@@ -168,7 +168,6 @@ def update_question(request, pk):
 
     # User should only edit questions that are still pending
     if question.status != "PENDING":
-        # TODO: Show a message that only pending questions can be edited
         return redirect("my_questions")
 
     if request.method == "POST":
@@ -178,11 +177,11 @@ def update_question(request, pk):
         if question_form.is_valid() and answer_formset.is_valid():
             question_form.save()
             answer_formset.save()
-
             return redirect("my_questions")
-        else:
-            question_form = QuestionForm(instance=question)
-            answer_formset = AnswerFormSet(instance=question)
+
+    else:
+        question_form = QuestionForm(instance=question)
+        answer_formset = AnswerFormSet(instance=question)
 
     return render(
         request,
@@ -469,7 +468,7 @@ def game_state_poller(request, join_code):
             question_number = current_index + 1
             total_questions = len(all_questions)
 
-            # Calculate percentage in the view
+            # Calculate percentage for progress bar
             if total_questions > 0:
                 progress_percentage = ((question_number - 1) * 100) / total_questions
 
