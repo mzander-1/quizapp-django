@@ -17,6 +17,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     "quizapp-mzander.pythonanywhere.com",
+    "localhost",
+    "127.0.0.1",
 ]
 
 

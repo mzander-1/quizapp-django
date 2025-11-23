@@ -139,9 +139,18 @@ def create_question(request):
             answer_formset.instance = question
             answer_formset.save()
 
+            messages.success(request, "Frage erfolgreich erstellt!")
             return redirect("my_questions")
         else:
-            pass  # Form is invalid, will re-render with errors
+            # Add error messages to help debug
+            if not question_form.is_valid():
+                messages.error(
+                    request, "Bitte korrigieren Sie die Fehler im Fragenformular."
+                )
+            if not answer_formset.is_valid():
+                messages.error(
+                    request, "Bitte korrigieren Sie die Fehler in den Antworten."
+                )
 
     else:
         question_form = QuestionForm()
@@ -168,6 +177,7 @@ def update_question(request, pk):
 
     # User should only edit questions that are still pending
     if question.status != "PENDING":
+        messages.warning(request, "Diese Frage kann nicht mehr bearbeitet werden.")
         return redirect("my_questions")
 
     if request.method == "POST":
@@ -177,7 +187,18 @@ def update_question(request, pk):
         if question_form.is_valid() and answer_formset.is_valid():
             question_form.save()
             answer_formset.save()
+            messages.success(request, "Frage erfolgreich aktualisiert!")
             return redirect("my_questions")
+        else:
+            # Add error messages to help debug
+            if not question_form.is_valid():
+                messages.error(
+                    request, "Bitte korrigieren Sie die Fehler im Fragenformular."
+                )
+            if not answer_formset.is_valid():
+                messages.error(
+                    request, "Bitte korrigieren Sie die Fehler in den Antworten."
+                )
 
     else:
         question_form = QuestionForm(instance=question)

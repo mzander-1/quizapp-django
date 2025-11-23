@@ -85,30 +85,48 @@ class BaseAnswerInlineFormSet(BaseInlineFormSet):
     """
 
     def clean(self):
+        """
+        Validates that:
+        1. At least one answer is provided
+        2. Exactly one answer is marked as correct
+        """
         super().clean()
 
-        if not self.is_valid():
+        # Don't validate if there are already errors in individual forms
+        if any(self.errors):
             return
 
         correct_answer_count = 0
         has_at_least_one_answer = False
+        filled_forms_count = 0
 
-        for form in self.forms:
+        for i, form in enumerate(self.forms):
+
+            # Skip empty or deleted forms
             if not form.cleaned_data or form.cleaned_data.get("DELETE"):
                 continue
 
-            has_at_least_one_answer = True
-            if form.cleaned_data.get("is_correct"):
-                correct_answer_count += 1
+            # Check if form has any text
+            if form.cleaned_data.get("text"):
+                filled_forms_count += 1
+                has_at_least_one_answer = True
 
+                if form.cleaned_data.get("is_correct"):
+                    correct_answer_count += 1
+
+        # Validate: at least one answer must be provided
         if not has_at_least_one_answer:
-            raise forms.ValidationError("Please provide at least one answer.")
+            error_msg = "Bitte geben Sie mindestens eine Antwort ein."
+            raise forms.ValidationError(error_msg)
 
+        # Validate: exactly one answer must be marked as correct
         if correct_answer_count == 0:
-            raise forms.ValidationError("Please mark one answer as correct.")
+            error_msg = "Bitte markieren Sie genau eine Antwort als korrekt."
+            raise forms.ValidationError(error_msg)
 
         if correct_answer_count > 1:
-            raise forms.ValidationError("Only one answer can be marked as correct.")
+            error_msg = "Es darf nur eine Antwort als korrekt markiert werden."
+            raise forms.ValidationError(error_msg)
 
 
 # Create the inline formset for Answers related to a Question
@@ -120,6 +138,7 @@ AnswerFormSet = inlineformset_factory(
     extra=4,  # Number of extra forms to display
     max_num=4,  # Maximum number of forms allowed
     can_delete=False,  # Disable deletion of answers (can be changed if needed)
+    validate_max=True,  # Ensure max_num is enforced
 )
 
 
