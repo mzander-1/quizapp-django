@@ -7,13 +7,26 @@
     {% csrf_token %}
     {{ answer_formset.management_form }}
 
-    <!-- Global Form-Errors -->
-    {% if question_form.non_field_errors or answer_formset.non_field_errors %}
-        <div class="bg-danger-100 border border-danger text-danger-800 px-4 py-3 rounded-md mb-6" role="alert">
+    <!-- Global Formset Errors (from clean() method) -->
+    {% if answer_formset.non_form_errors %}
+        <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-md mb-6" role="alert">
             <strong class="font-bold">Fehler:</strong>
-            <ul class="list-disc list-inside">
-                {% for error in question_form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
-                {% for error in answer_formset.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+            <ul class="list-disc list-inside mt-2">
+                {% for error in answer_formset.non_form_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Global Question Form Errors -->
+    {% if question_form.non_field_errors %}
+        <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-md mb-6" role="alert">
+            <strong class="font-bold">Fehler:</strong>
+            <ul class="list-disc list-inside mt-2">
+                {% for error in question_form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
             </ul>
         </div>
     {% endif %}
@@ -31,6 +44,11 @@
                         {{ question_form.course.label }}
                     </label>
                     {{ question_form.course }}
+                    {% if question_form.course.errors %}
+                        <p class="text-red-600 text-sm mt-1">
+                            {% for error in question_form.course.errors %}{{ error }}{% endfor %}
+                        </p>
+                    {% endif %}
                 </div>
                 <!-- Question Text -->
                 <div class="mb-4">
@@ -38,6 +56,11 @@
                         {{ question_form.text.label }}
                     </label>
                     {{ question_form.text }}
+                    {% if question_form.text.errors %}
+                        <p class="text-red-600 text-sm mt-1">
+                            {% for error in question_form.text.errors %}{{ error }}{% endfor %}
+                        </p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -49,6 +72,11 @@
                         {{ question_form.explanation.label }}
                     </label>
                     {{ question_form.explanation }}
+                    {% if question_form.explanation.errors %}
+                        <p class="text-red-600 text-sm mt-1">
+                            {% for error in question_form.explanation.errors %}{{ error }}{% endfor %}
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -69,7 +97,9 @@
                         </label>
                         {{ form.text }}
                         {% if form.text.errors %}
-                            <p class="text-danger text-sm mt-1">{{ form.text.errors.as_text }}</p>
+                            <p class="text-red-600 text-sm mt-1">
+                                {% for error in form.text.errors %}{{ error }}{% endfor %}
+                            </p>
                         {% endif %}
                     </div>
                     <!-- "Correct?" Checkbox -->
@@ -78,6 +108,11 @@
                         <label for="{{ form.is_correct.id_for_label }}" class="ml-2 block text-sm font-medium text-text_default">
                             Korrekt?
                         </label>
+                        {% if form.is_correct.errors %}
+                            <p class="text-red-600 text-sm ml-2">
+                                {% for error in form.is_correct.errors %}{{ error }}{% endfor %}
+                            </p>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
