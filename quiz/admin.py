@@ -52,7 +52,7 @@ class QuestionAdmin(admin.ModelAdmin):
     model = Question
     inlines = [AnswerInline]
 
-    list_display = ("text", "course", "status", "creator", "created_at")
+    list_display = ("truncated_text", "course", "status", "creator", "created_at")
     list_filter = ("status", "course", "creator")
     search_fields = (
         "text",
@@ -61,6 +61,17 @@ class QuestionAdmin(admin.ModelAdmin):
     )
 
     actions = ["approve_questions"]
+
+    def truncated_text(self, obj):
+        """
+        Returns a truncated version of the question text for display.
+        """
+        max_length = 50
+        if len(obj.text) > max_length:
+            return f"{obj.text[:max_length]}..."
+        return obj.text
+
+    truncated_text.short_description = "Text"
 
     def approve_questions(self, request, queryset):
         """
