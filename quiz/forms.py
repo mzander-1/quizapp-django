@@ -33,13 +33,13 @@ class QuestionForm(forms.ModelForm):
             "text": forms.Textarea(
                 attrs={
                     "rows": 4,
-                    "class": "w-full border-gray-300 rounded-md shadow-sm",
+                    "class": "w-full border-gray-300 rounded-md shadow-sm max-length-500",
                 }
             ),
             "explanation": forms.Textarea(
                 attrs={
                     "rows": 3,
-                    "class": "w-full border-gray-300 rounded-md shadow-sm",
+                    "class": "w-full border-gray-300 rounded-md shadow-sm max-length-1000",
                 }
             ),
             "course": forms.Select(
@@ -51,6 +51,32 @@ class QuestionForm(forms.ModelForm):
             "explanation": "Erklärung (optional)",
             "course": "Kurs (optional)",
         }
+
+    def clean_text(self):
+        """
+        Validates the length of the text field
+        """
+        text = self.cleaned_data.get("text")
+        if text and len(text) > 500:
+            raise forms.ValidationError(
+                f"Der Fragentext darf maximal 500 Zeichen lang sein."
+                f" (Aktuelle Länge: {len(text)})"
+            )
+
+        return text
+
+    def clean_explanation(self):
+        """
+        Validates the length of the explanation field
+        """
+        explanation = self.cleaned_data.get("explanation")
+        if explanation and len(explanation) > 1000:
+            raise forms.ValidationError(
+                f"Die Erklärung darf maximal 1000 Zeichen lang sein."
+                f" (Aktuelle Länge: {len(explanation)})"
+            )
+
+        return explanation
 
 
 class AnswerForm(forms.ModelForm):
@@ -78,6 +104,19 @@ class AnswerForm(forms.ModelForm):
         }
         labels = {"text": "Antworttext", "is_correct": "Richtige Antwort"}
 
+    def clean_text(self):
+        """
+        Validates the length of the answer text field
+        """
+        text = self.cleaned_data.get("text")
+        if text and len(text) > 500:
+            raise forms.ValidationError(
+                f"Der Antworttext darf maximal 500 Zeichen lang sein."
+                f" (Aktuelle Länge: {len(text)})"
+            )
+
+        return text
+
 
 class BaseAnswerInlineFormSet(BaseInlineFormSet):
     """
@@ -102,11 +141,9 @@ class BaseAnswerInlineFormSet(BaseInlineFormSet):
 
         for i, form in enumerate(self.forms):
 
-            # Skip empty or deleted forms
             if not form.cleaned_data or form.cleaned_data.get("DELETE"):
                 continue
 
-            # Check if form has any text
             if form.cleaned_data.get("text"):
                 filled_forms_count += 1
                 has_at_least_one_answer = True
@@ -114,12 +151,10 @@ class BaseAnswerInlineFormSet(BaseInlineFormSet):
                 if form.cleaned_data.get("is_correct"):
                     correct_answer_count += 1
 
-        # Validate: at least one answer must be provided
         if not has_at_least_one_answer:
             error_msg = "Bitte geben Sie mindestens eine Antwort ein."
             raise forms.ValidationError(error_msg)
 
-        # Validate: exactly one answer must be marked as correct
         if correct_answer_count == 0:
             error_msg = "Bitte markieren Sie genau eine Antwort als korrekt."
             raise forms.ValidationError(error_msg)
