@@ -1,6 +1,6 @@
-# Project: Cooperative Online Quiz System (ISEF01)
+# Project: Cooperative Online Quiz System
 
-Welcome to the project repository! This is the source code for our prototype of a cooperative online quiz system for the IU Software Engineering project.
+Welcome to the project repository! This is the source code for my prototype of a cooperative and collaborative online quiz system.
 
 This document explains how to set up the project on your own computer for testing purposes or (later) to collaborate on the user manual.
 
@@ -33,7 +33,7 @@ Follow these steps to set up the project locally.
 Open your terminal, navigate to the folder where you store your projects (e.g., cd Documents/Projects), and clone the repository.
 
 ```shell
-git clone git@gitlab.com:projekt-software-engineering/Quizduell.git
+git clone git@github.com:mzander-1/quizapp-django.git
 ```
 Change into the newly created project folder
 
@@ -106,7 +106,7 @@ Now, open your web browser and go to:
 ```
 http://127.0.0.1:8000/
 ```
-You should see the Django welcome page or (later) our project homepage.
+You should see the project homepage.
 
 #### Logging in as Admin
 
